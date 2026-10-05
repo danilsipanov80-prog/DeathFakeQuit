@@ -20,22 +20,17 @@ public final class DeathFakeQuit extends JavaPlugin implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
 
-        // 1. Убираем стандартное сообщение о смерти
+        // Убираем стандартное сообщение о смерти — будем показывать своё
         event.setDeathMessage(null);
 
-        // 2. Личное сообщение только умершему игроку
+        // 1. Сразу показываем всем, что игрок убит
+        Bukkit.broadcastMessage("§c☠ " + player.getName() + " был убит!");
+
+        // 2. Личное сообщение умершему
         player.sendMessage("§c§l☠ Ты умер!");
-        player.sendMessage("§7Другие игроки видят, что ты покинул игру.");
+        player.sendMessage("§7Сейчас другие увидят, что ты покинул игру...");
 
-        // 3. Фейковое сообщение о выходе — всем ОСТАЛЬНЫМ игрокам
-        String fakeQuitMessage = "§e" + player.getName() + " покинул игру";
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            if (!onlinePlayer.equals(player)) {
-                onlinePlayer.sendMessage(fakeQuitMessage);
-            }
-        }
-
-        // 4. Звук пробуждения визера — всем игрокам
+        // 3. Звук пробуждения визера — всем игрокам
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             onlinePlayer.playSound(
                 onlinePlayer.getLocation(),
@@ -44,5 +39,16 @@ public final class DeathFakeQuit extends JavaPlugin implements Listener {
                 1.0F
             );
         }
+
+        // 4. Через 3 секунды (60 тиков) — фейковое сообщение о выходе
+        //    Только для тех, кто ещё онлайн и не сам умерший
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            String fakeQuitMessage = "§e" + player.getName() + " покинул игру";
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                if (!onlinePlayer.equals(player)) {
+                    onlinePlayer.sendMessage(fakeQuitMessage);
+                }
+            }
+        }, 60L); // 60 тиков = 3 секунды. Хочешь быстрее — поставь 40 (2 сек) или 20 (1 сек)
     }
 }
