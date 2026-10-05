@@ -1,0 +1,6 @@
+name: DeathFakeQuit
+version: 1.0
+main: ru.example.deathfakequit.DeathFakeQuit
+api-version: '1.21'
+description: Заменяет сообщение о смерти на поддельный выход + звук визера
+author: YourName
