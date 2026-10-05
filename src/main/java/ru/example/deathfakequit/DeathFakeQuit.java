@@ -18,18 +18,13 @@ public final class DeathFakeQuit extends JavaPlugin implements Listener {
         getLogger().info("DeathFakeQuit включен!");
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
         event.setDeathMessage(null);
 
-        // Берём текущий ник из таба (он уже мог быть изменён плагином UnjustNickSwap)
-        String currentName = player.getPlayerListName();
-        if (currentName == null || currentName.isEmpty()) {
-            currentName = player.getName();
-        }
-        // Убираем цветовые коды, чтобы ник не ломался при вставке
-        currentName = currentName.replaceAll("§[0-9a-fk-or]", "");
+        // Берём оригинальный ник игрока (он ещё не изменён плагином UnjustNickSwap)
+        String currentName = player.getName();
 
         // 1. Определяем причину смерти
         String deathReason = "умер";
@@ -45,42 +40,83 @@ public final class DeathFakeQuit extends JavaPlugin implements Listener {
                         deathReason = "был убит мобом";
                     }
                     break;
-                case PROJECTILE: deathReason = "был застрелен"; break;
-                case FALL: deathReason = "разбился насмерть"; break;
+                case PROJECTILE:
+                    deathReason = "был застрелен";
+                    break;
+                case FALL:
+                    deathReason = "разбился насмерть";
+                    break;
                 case BLOCK_EXPLOSION:
-                case ENTITY_EXPLOSION: deathReason = "взорвался"; break;
+                case ENTITY_EXPLOSION:
+                    deathReason = "взорвался";
+                    break;
                 case FIRE:
-                case FIRE_TICK: deathReason = "сгорел"; break;
-                case LAVA: deathReason = "сгорел в лаве"; break;
-                case DROWNING: deathReason = "утонул"; break;
-                case VOID: deathReason = "упал в пустоту"; break;
-                case POISON: deathReason = "отравился"; break;
-                case WITHER: deathReason = "умер от иссушения"; break;
-                case STARVATION: deathReason = "умер от голода"; break;
-                case MAGIC: deathReason = "умер от магии"; break;
-                case LIGHTNING: deathReason = "был убит молнией"; break;
-                case SUFFOCATION: deathReason = "задохнулся"; break;
-                case CONTACT: deathReason = "умер от кактуса"; break;
-                case CRAMMING: deathReason = "был раздавлен"; break;
-                case FLY_INTO_WALL: deathReason = "влетел в стену"; break;
-                case HOT_FLOOR: deathReason = "сгорел на магме"; break;
-                case DRAGON_BREATH: deathReason = "умер от дыхания дракона"; break;
-                case FALLING_BLOCK: deathReason = "был раздавлен блоком"; break;
-                case THORNS: deathReason = "умер от шипов"; break;
-                default: deathReason = "умер";
+                case FIRE_TICK:
+                    deathReason = "сгорел";
+                    break;
+                case LAVA:
+                    deathReason = "сгорел в лаве";
+                    break;
+                case DROWNING:
+                    deathReason = "утонул";
+                    break;
+                case VOID:
+                    deathReason = "упал в пустоту";
+                    break;
+                case POISON:
+                    deathReason = "отравился";
+                    break;
+                case WITHER:
+                    deathReason = "умер от иссушения";
+                    break;
+                case STARVATION:
+                    deathReason = "умер от голода";
+                    break;
+                case MAGIC:
+                    deathReason = "умер от магии";
+                    break;
+                case LIGHTNING:
+                    deathReason = "был убит молнией";
+                    break;
+                case SUFFOCATION:
+                    deathReason = "задохнулся";
+                    break;
+                case CONTACT:
+                    deathReason = "умер от кактуса";
+                    break;
+                case CRAMMING:
+                    deathReason = "был раздавлен";
+                    break;
+                case FLY_INTO_WALL:
+                    deathReason = "влетел в стену";
+                    break;
+                case HOT_FLOOR:
+                    deathReason = "сгорел на магме";
+                    break;
+                case DRAGON_BREATH:
+                    deathReason = "умер от дыхания дракона";
+                    break;
+                case FALLING_BLOCK:
+                    deathReason = "был раздавлен блоком";
+                    break;
+                case THORNS:
+                    deathReason = "умер от шипов";
+                    break;
+                default:
+                    deathReason = "умер";
             }
         }
 
-        // 2. Сразу показываем причину смерти с текущим ником
+        // 2. Сразу показываем причину смерти — БЕЛЫМ, со старым ником
         Bukkit.broadcastMessage("§f" + currentName + " " + deathReason);
 
-        // 3. Сразу показываем «покинул игру» с тем же ником
+        // 3. Сразу показываем «покинул игру» — ЖЁЛТЫМ, со старым ником
         Bukkit.broadcastMessage("§e" + currentName + " покинул игру");
 
-        // 4. Личное сообщение умершему
+        // 4. Личное сообщение умершему — БЕЛЫМ
         player.sendMessage("§fТы " + deathReason);
 
-        // 5. Звук визера
+        // 5. Звук пробуждения визера — всем игрокам
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             onlinePlayer.playSound(
                 onlinePlayer.getLocation(),
