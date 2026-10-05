@@ -104,7 +104,7 @@ public final class DeathFakeQuit extends JavaPlugin implements Listener {
         }
 
         // 2. Сразу показываем причину смерти всем
-        Bukkit.broadcastMessage("§c" + player.getName() + " " + deathReason);
+        Bukkit.broadcastMessage("§f" + player.getName() + " " + deathReason);
 
         // 3. Сразу же показываем фейковый выход из игры
         Bukkit.broadcastMessage("§e" + player.getName() + " покинул игру");
