@@ -19,9 +19,23 @@ public final class DeathFakeQuit extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        event.setDeathMessage(null);
-        Bukkit.broadcastMessage("§e" + player.getName() + " покинул игру");
 
+        // 1. Убираем стандартное сообщение о смерти
+        event.setDeathMessage(null);
+
+        // 2. Личное сообщение только умершему игроку
+        player.sendMessage("§c§l☠ Ты умер!");
+        player.sendMessage("§7Другие игроки видят, что ты покинул игру.");
+
+        // 3. Фейковое сообщение о выходе — всем ОСТАЛЬНЫМ игрокам
+        String fakeQuitMessage = "§e" + player.getName() + " покинул игру";
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (!onlinePlayer.equals(player)) {
+                onlinePlayer.sendMessage(fakeQuitMessage);
+            }
+        }
+
+        // 4. Звук пробуждения визера — всем игрокам
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             onlinePlayer.playSound(
                 onlinePlayer.getLocation(),
